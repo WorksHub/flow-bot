@@ -3,6 +3,11 @@
   :url "http://example.com/FIXME"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
+  :profiles {:uberjar {:main         flow_bot.core
+                       :omit-source  true
+                       :aot          :all
+                       :source-paths ["src"]
+                       :uberjar-name "flow-bot.jar"}}
   :dependencies [[cheshire "5.8.1"]
                  [clj-http "3.9.1"]
                  [clj-jgit "0.8.10"]
