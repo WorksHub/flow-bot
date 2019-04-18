@@ -2,42 +2,38 @@
   (:require
     [clojure.java.shell :as sh]
     [clojure.string :as str]
+    [environ.core :refer [env]]
     [clojure.tools.logging :as log]
     [tentacles.issues :as issues]
     [tentacles.orgs :as orgs]
     [tentacles.pulls :as pulls]
     [tentacles.repos :as repos]))
 
-(def org "test-org-integration")
-(def server-repo "test-app")
-(def client-repo "client-app")
-(def client-folder "client")
-
-(def auth "WorksHubCodi:05c7d7929d18fe47cce8932f2e171f92c4fdadec") ;; TODO deprecate this access token and move to variables
-
-(def magic-string "OK TO MERGE")
-
 (defn create-server-pr [branch-name pr-title original-pr]
-  (pulls/create-pull org server-repo pr-title "master" branch-name
-                     {:auth auth
-                      :body (format "This is the code that appeared on %s/%s#%s" org client-repo original-pr)}))
+  (pulls/create-pull (env :org)
+                     (env :server-repo)
+                     pr-title
+                     "master"
+                     branch-name
+                     {:auth (env :auth)
+                      :body (format "This is the code that appeared on %s/%s#%s" (env :org) (env :client-repo) original-pr)}))
 
 (defn client-pr [id]
-  (pulls/specific-pull org client-repo id {:auth auth}))
+  (pulls/specific-pull (env :org) (env :client-repo) id {:auth (env :auth)}))
 
 
 (defn close-client-pr [id]
-  (pulls/edit-pull org client-repo id {:auth  auth
-                                       :title "New title"
-                                       :body  "this should be closed"
-                                       :state "closed"}))
+  (pulls/edit-pull (env :org) (env :client-repo) id {:auth  (env :auth)
+                                                     :title "New title"
+                                                     :body  "this should be closed"
+                                                     :state "closed"}))
 
 (defn server-branch-exists? [branch-name]
-  (contains? (set (map :name (repos/branches org server-repo {:auth auth})))
+  (contains? (set (map :name (repos/branches (env :org) (env :server-repo) {:auth (env :auth)})))
              branch-name))
 
 (defn create-closing-comment [id]
-  (issues/create-comment org client-repo id "Thanks for contributing! This code has been merged upstream!" {:auth auth}))
+  (issues/create-comment (env :org) (env :client-repo) id "Thanks for contributing! This code has been merged upstream!" {:auth (env :auth)}))
 
 ;;;
 
@@ -49,20 +45,20 @@
 
 (defmethod handle-event! "push" [event]
   "We're only interested in push events to master in server repo"
-  (when (and (= server-repo (get-in event [:repository :name]))
+  (when (and (= (env :server-repo) (get-in event [:repository :name]))
              (= "refs/heads/master" (get-in event [:ref])))
     (log/info "Received a push on master branch on server repo, syncing client-repo")
-    (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s" server-repo client-repo client-folder))))
+    (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s" (env :server-repo) (env :client-repo) (env :client-folder)))))
 
 (defmethod handle-event! "issue_comment" [event]
   (let [pr-id (get-in event [:issue :number])
         user (get-in event [:comment :user :login])
         org (get-in event [:organization :login])
-        owner? (orgs/member? org user {:auth auth})]
-    (when (and (= client-repo (get-in event [:repository :name]))
+        owner? (orgs/member? org user {:auth (env :auth)})]
+    (when (and (= (env :client-repo) (get-in event [:repository :name]))
                owner?
                (get-in event [:comment :body])
-               (str/includes? (get-in event [:comment :body]) magic-string))
+               (str/includes? (get-in event [:comment :body]) (env :magic-string)))
       (log/info "Detected a PR comment saying it's okay to merge PR: " pr-id)
       (let [pr (client-pr pr-id)
             clone-url (get-in pr [:head :repo :clone_url])
@@ -82,12 +78,11 @@
                 (log/error "Error when creating server PR"))))
           (log/error "ERROR WHEN SYNCING CLIENT TO SERVER"))))))
 
-
 (defmethod handle-event! "pull_request" [event]
   (let [pr-title (get-in event [:pull_request :title])
         closed? (= "closed" (:action event))
         merged? (get-in event [:pull_request :merged])]
-    (when (and (= server-repo (get-in event [:repository :name]))
+    (when (and (= (env :server-repo) (get-in event [:repository :name]))
                closed?
                merged?)
       (log/info "Server PR coming originally from Client Repo has been merged")

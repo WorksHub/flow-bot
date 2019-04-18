@@ -7,6 +7,7 @@
                  [clj-http "3.9.1"]
                  [clj-jgit "0.8.10"]
                  [compojure "1.6.1"]
+                 [environ "1.1.0"]
                  [mount "0.1.14"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/tools.logging "0.4.1"]

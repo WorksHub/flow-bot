@@ -11,6 +11,7 @@
 (defroutes handler
   (POST "/" {:keys [headers body]}
     (let [event (assoc body :event-type (get headers "x-github-event"))]
+      (log/debug event)
       (event/handle-event! event))
     (response/response "ok")))
 
