@@ -6,21 +6,19 @@ set -x
 set -e # Exit with nonzero when a command fails.
 set -u # Exit with nonzero when referencing an unbound variable
 
-## TODO what todo with this?
-SERVER_REPO="test-app"
-SERVER_GIT="https://github.com/test-org-integration/test-app"
+SERVER_REPO=$1
+SERVER_GIT=$2
+CLIENT_REPO=$3
+CLIENT_GIT=$4
 
-CLIENT_REPO="client-app"
-CLIENT_GIT="https://github.com/test-org-integration/client-app"
 mkdir -p local-repos
 
 cd local-repos
 
-if [[ ! -f ${SERVER_REPO} ]]; then
-    git clone ${SERVER_GIT}
-fi
+rm -rf ${SERVER_REPO}
+git clone ${SERVER_GIT}
 
-if [[ ! -f ${CLIENT_REPO} ]]; then
-    git clone ${CLIENT_GIT}
-fi
+rm -rf ${CLIENT_REPO}
+git clone ${CLIENT_GIT}
+
 cd ..

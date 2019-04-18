@@ -1,6 +1,8 @@
 (ns flow-bot.core
   (:require
+    [clojure.java.shell :as sh]
     [clojure.tools.logging :as log]
+    [environ.core :refer [env]]
     [compojure.core :refer [defroutes GET PUT POST DELETE routes]]
     [flow-bot.event :as event]
     [mount.core :as mount]
@@ -26,6 +28,9 @@
   :stop (do (log/info "Stopping server")
             (.stop server)))
 
+
+(defn init-repos! []
+  (log/info (sh/sh "sh" "-c" (format "./init-repos.sh %s %s %s %s" (env :server-repo) (env :server-git) (env :client-repo) (env :client-git)))))
 
 (defn go []
   (mount/start))
