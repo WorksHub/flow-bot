@@ -10,30 +10,30 @@
     [tentacles.repos :as repos]))
 
 (defn create-server-pr [branch-name pr-title original-pr]
-  (pulls/create-pull (env :org)
+  (pulls/create-pull (env :server-org)
                      (env :server-repo)
                      pr-title
                      "master"
                      branch-name
                      {:auth (env :auth)
-                      :body (format "This is the code that appeared on %s/%s#%s" (env :org) (env :client-repo) original-pr)}))
+                      :body (format "This is the code that appeared on %s/%s#%s" (env :server-org) (env :client-repo) original-pr)}))
 
 (defn client-pr [id]
-  (pulls/specific-pull (env :org) (env :client-repo) id {:auth (env :auth)}))
+  (pulls/specific-pull (env :client-org) (env :client-repo) id {:auth (env :auth)}))
 
 
 (defn close-client-pr [id]
-  (pulls/edit-pull (env :org) (env :client-repo) id {:auth  (env :auth)
+  (pulls/edit-pull (env :client-org) (env :client-repo) id {:auth  (env :auth)
                                                      :title "New title"
                                                      :body  "this should be closed"
                                                      :state "closed"}))
 
 (defn server-branch-exists? [branch-name]
-  (contains? (set (map :name (repos/branches (env :org) (env :server-repo) {:auth (env :auth)})))
+  (contains? (set (map :name (repos/branches (env :server-org) (env :server-repo) {:auth (env :auth)})))
              branch-name))
 
 (defn create-closing-comment [id]
-  (issues/create-comment (env :org) (env :client-repo) id "Thanks for contributing! This code has been merged upstream!" {:auth (env :auth)}))
+  (issues/create-comment (env :client-org) (env :client-repo) id "Thanks for contributing! This code has been merged upstream!" {:auth (env :auth)}))
 
 ;;;
 

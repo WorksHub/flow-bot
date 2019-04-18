@@ -21,16 +21,17 @@
   (-> (routes handler)
       (wrap-json-body {:keywords? true})))
 
+(defn init-repos! []
+  (log/info (sh/sh "sh" "-c" (format "./init-repos.sh %s %s %s %s" (env :server-repo) (env :server-git) (env :client-repo) (env :client-git)))))
+
 (mount/defstate server
-  :start (do (log/info "Server started")
+  :start (do (log/info "Starting server")
+             (init-repos!)
              (jetty/run-jetty #'app {:join? false
                                      :port  3000}))
   :stop (do (log/info "Stopping server")
             (.stop server)))
 
-
-(defn init-repos! []
-  (log/info (sh/sh "sh" "-c" (format "./init-repos.sh %s %s %s %s" (env :server-repo) (env :server-git) (env :client-repo) (env :client-git)))))
 
 (defn go []
   (mount/start))

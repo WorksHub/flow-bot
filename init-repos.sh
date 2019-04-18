@@ -15,10 +15,8 @@ mkdir -p local-repos
 
 cd local-repos
 
-rm -rf ${SERVER_REPO}
+rm -rf *
 git clone ${SERVER_GIT}
-
-rm -rf ${CLIENT_REPO}
 git clone ${CLIENT_GIT}
 
 cd ..
