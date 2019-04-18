@@ -20,5 +20,5 @@
                  [ring "1.6.1"]
                  [ring/ring-json "0.4.0"]
                  [tentacles "0.5.1"]]
-  :min-lein-version "2.9.1"
+  :min-lein-version "2.8.3"
   :repl-options {:init-ns flow-bot.core})

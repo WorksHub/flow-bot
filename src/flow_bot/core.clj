@@ -35,9 +35,8 @@
 
 (mount/defstate server
   :start (do (log/info "Starting server")
-
              (jetty/run-jetty #'app {:join? false
-                                     :port  3000}))
+                                     :port  (Integer/parseInt (or (env :port) "3000"))}))
   :stop (do (log/info "Stopping server")
             (.stop server)))
 
