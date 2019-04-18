@@ -8,7 +8,7 @@
                  [clj-jgit "0.8.10"]
                  [compojure "1.6.1"]
                  [environ "1.1.0"]
-                 [mount "0.1.14"]
+                 [mount "0.1.16"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/tools.logging "0.4.1"]
                  [org.slf4j/slf4j-log4j12 "1.7.26"]

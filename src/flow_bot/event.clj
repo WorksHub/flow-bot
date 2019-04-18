@@ -48,7 +48,7 @@
   (when (and (= (env :server-repo) (get-in event [:repository :name]))
              (= "refs/heads/master" (get-in event [:ref])))
     (log/info "Received a push on master branch on server repo, syncing client-repo")
-    (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s" (env :server-repo) (env :client-repo) (env :client-folder)))))
+    (log/info (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s" (env :server-repo) (env :client-repo) (env :client-folder))))))
 
 (defmethod handle-event! "issue_comment" [event]
   (let [pr-id (get-in event [:issue :number])
@@ -68,7 +68,7 @@
             author "Daniel Janus"
             author-email "dj@danieljanus.pl"]
         (log/info (format "Syncing %s - branch %s - PR #%s - Author %s <%s> - Msg: %s" clone-url branch pr-id author author-email new-pr-title))
-        (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s %s" clone-url branch pr-id author author-email new-pr-title)))
+        (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s '%s'" clone-url branch pr-id author author-email new-pr-title)))
         (if (server-branch-exists? new-branch-name)
           (do
             (log/info "Branch successfully created, creating pull request!" new-branch-name new-pr-title)
@@ -79,18 +79,18 @@
           (log/error "ERROR WHEN SYNCING CLIENT TO SERVER"))))))
 
 (defmethod handle-event! "pull_request" [event]
-  (let [pr-title (get-in event [:pull_request :title])
+  (let [pr-branch (get-in event [:pull_request :head :ref])
         closed? (= "closed" (:action event))
         merged? (get-in event [:pull_request :merged])]
     (when (and (= (env :server-repo) (get-in event [:repository :name]))
                closed?
                merged?)
       (log/info "Server PR coming originally from Client Repo has been merged")
-      (let [client-pr-id (str/replace pr-title #"client-" "")
+      (let [client-pr-id (str/replace pr-branch #"client-" "")
+            _ (log/info (format "Retrieving info about Client PR #%s" client-pr-id))
             pr (client-pr client-pr-id)]
         (when (= "open" (:state pr))
           (log/info "Notifying user that their PR was merged upstream")
           (create-closing-comment client-pr-id)
           (log/info "Attempting to close the PR")
           (close-client-pr client-pr-id))))))
-

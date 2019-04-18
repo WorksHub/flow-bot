@@ -15,15 +15,14 @@
       (event/handle-event! event))
     (response/response "ok")))
 
-
 (def app
   (-> (routes handler)
       (wrap-json-body {:keywords? true})))
 
 (mount/defstate server
-  :start (do (jetty/run-jetty #'app {:join? false
-                                     :port  3000})
-             (log/info "Server started"))
+  :start (do (log/info "Server started")
+             (jetty/run-jetty #'app {:join? false
+                                     :port  3000}))
   :stop (do (log/info "Stopping server")
             (.stop server)))
 
