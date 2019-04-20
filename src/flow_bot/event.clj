@@ -16,7 +16,7 @@
                      "master"
                      branch-name
                      {:auth (env :auth)
-                      :body (format "This is the code that appeared on %s/%s#%s" (env :server-org) (env :client-repo) original-pr)}))
+                      :body (format "This is the code that appeared on %s/%s#%s" (env :client-org) (env :client-repo) original-pr)}))
 
 (defn client-pr [id]
   (pulls/specific-pull (env :client-org) (env :client-repo) id {:auth (env :auth)}))
