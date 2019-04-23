@@ -1,9 +1,10 @@
 (ns flow-bot.core
   (:require
+    [clojure.core.async :as async]
     [clojure.java.shell :as sh]
     [clojure.tools.logging :as log]
-    [environ.core :refer [env]]
     [compojure.core :refer [defroutes GET PUT POST DELETE routes]]
+    [environ.core :refer [env]]
     [flow-bot.event :as event]
     [mount.core :as mount]
     [ring.adapter.jetty :as jetty]
@@ -11,12 +12,23 @@
     [ring.util.response :as response])
   (:gen-class))
 
+(def event-queue (async/chan 10))
+
+(mount/defstate event-processor
+  :start (do (prn "Starting event-processor")
+             (async/go-loop []
+               (let [msg (async/<! event-queue)]
+                 (event/handle-event! msg)
+                 (recur)))))
+
+
 (defroutes handler
+  (GET "/" _req (response/response "This service is API-only. Please refer to documentation"))
   (POST "/" {:keys [headers body]}
     (let [event (assoc body :event-type (get headers "x-github-event"))]
       (log/info "Received event: " (:event-type event))
       (log/debug event)
-      (event/handle-event! event))
+      (async/>!! event-queue event))
     (response/response "ok")))
 
 (defn print-env []
