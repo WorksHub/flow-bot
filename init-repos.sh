@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-## This file ensures the server and client repo exist
+# This script initializes the local repositories under the folder
+# `local-repos`. It also sets the Git user for WorksHubCodi.
 
 set -x
 set -e # Exit with nonzero when a command fails.

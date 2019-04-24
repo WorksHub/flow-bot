@@ -11,22 +11,19 @@
     [tentacles.repos :as repos]
     [clojure.string :as string]))
 
-
 (defonce app-state (atom {:authors {}}))
 
-(defn create-server-pr [branch-name pr-title author original-pr-id]
+(defn create-server-pr [branch-name pr-title original-pr-id]
   (pulls/create-pull (env :server-org)
                      (env :server-repo)
                      pr-title
                      "master"
                      branch-name
                      {:auth (env :auth)
-                      :body (format "This is the code that appeared on %s/%s#%s \n\nAuthor: '%s' <%s>"
+                      :body (format "This is the code that appeared on %s/%s#%s"
                                     (env :client-org)
                                     (env :client-repo)
-                                    original-pr-id
-                                    (:name author)
-                                    (:email author))}))
+                                    original-pr-id)}))
 
 (defn client-pr [id]
   (pulls/specific-pull (env :client-org) (env :client-repo) id {:auth (env :auth)}))
@@ -122,7 +119,7 @@
         (if (server-branch-exists? new-branch-name)
           (do
             (log/info "Branch successfully created, creating pull request!" new-branch-name new-pr-title)
-            (let [result (create-server-pr new-branch-name new-pr-title author pr-id)]
+            (let [result (create-server-pr new-branch-name new-pr-title pr-id)]
               (if (= "open" (:state result))
                 (log/info "PR on server created succesfully")
                 (log/error "Error when creating server PR"))))

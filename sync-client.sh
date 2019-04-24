@@ -13,22 +13,28 @@ MSG=$4
 AUTHOR_NAME=$5
 AUTHOR_EMAIL=$6
 
+# resets local copy of server repo to latest master
 cd local-repos/${SERVER_REPO}
 git fetch
-# HASH=$(git log origin/master -1 --pretty=%h)
-# MSG=$(git log origin/master -1 --pretty=%s)
 git checkout master
 git reset --hard origin/master
-cd ../${CLIENT_REPO}
 
+# resets local copy of client repo to latest master
+cd ../${CLIENT_REPO}
 git fetch
 git checkout master
 git reset --hard origin/master
 rm -rf ${CLIENT_FOLDER}
+
+# copies over the client folder from server to client
 cp -R ../${SERVER_REPO}/${CLIENT_FOLDER} .
 git add --all
+
+# attribute the commit to the original author on the server repo
 git commit -m "${MSG}" --author "${AUTHOR_NAME} <${AUTHOR_EMAIL}>"
 git push origin master
+
+# clean up and go back to top level
 git reset --hard HEAD
 cd ../..
 
