@@ -19,7 +19,14 @@ rm -rf *
 git clone ${SERVER_GIT}
 git clone ${CLIENT_GIT}
 
-git config --global user.name "WorksHubCodi"
-git config --global user.email "codi@works-hub.com"
+cd ${SERVER_REPO}
 
-cd ..
+git config user.name "WorksHubCodi"
+git config user.email "davide+kodi@functionalworks.com"
+
+cd ../${CLIENT_REPO}
+
+git config user.name "WorksHubCodi"
+git config user.email "davide+kodi@functionalworks.com"
+
+cd ../..

@@ -9,14 +9,16 @@ set -u # Exit with nonzero when referencing an unbound variable
 SERVER_REPO=$1
 CLIENT_REPO=$2
 CLIENT_FOLDER=$3
+MSG=$4
+AUTHOR_NAME=$4
+AUTHOR_EMAIL=$5
 
 cd local-repos/${SERVER_REPO}
 git fetch
-HASH=$(git log origin/master -1 --pretty=%h)
-MSG=$(git log origin/master -1 --pretty=%s)
+# HASH=$(git log origin/master -1 --pretty=%h)
+# MSG=$(git log origin/master -1 --pretty=%s)
 git checkout master
 git reset --hard origin/master
-# git diff origin/master~ origin/master -- ${CLIENT_FOLDER} > ../client-${HASH}.patch
 cd ../${CLIENT_REPO}
 
 git fetch
@@ -24,11 +26,9 @@ git checkout master
 git reset --hard origin/master
 rm -rf ${CLIENT_FOLDER}
 cp -R ../${SERVER_REPO}/${CLIENT_FOLDER} .
-#git apply ../client-${HASH}.patch
 git add --all
-git commit -m "${MSG}"
+git commit -m "${MSG}" --author "${AUTHOR_NAME} <${AUTHOR_EMAIL}>"
 git push origin master
 git reset --hard HEAD
-#rm ../client-${HASH}.patch
 cd ../..
 
