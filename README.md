@@ -26,7 +26,7 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 
 - The application waits for a **PR comment** that contains the `magic-string` (in our example `OK TO MERGE`)
 - The application checks out the PR branch on `client-repo`
-- The application thens checks out `master` on `server-repo`, creates a new branch called `client-$i` where `$i` is the PR number on GitHub 
+- The application then checks out `master` on `server-repo`, creates a new branch called `client-$i` where `$i` is the PR number on GitHub 
 - The application copies over the `client` folder from `client-repo` to on `server-repo`
 - The application commits the changes to `server-repo` attributing the commit authorship to the original committer of the PR
 - The application creates a new PR on `server-repo`
