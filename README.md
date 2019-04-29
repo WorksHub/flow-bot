@@ -10,12 +10,12 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 
 - Updates to `client-folder` in `server-repo` should propagate to `client-repo`
 - People can open Pull Requests against `client-repo`
-- Once deemed **OK** to be merged, changes are brough into `server-repo`
+- Once deemed **OK** to be merged, changes are brought into `server-repo`
 - Attribution is kept consistent in both repositories, as much as possible.
 
 ## Requirements:
 
-- One github account to use as "committer" for the sync changes with an `auth` token. (TODO: use Github Apps)
+- One github account (with `auth` token) to use as "actor" for all the synchronization. (TODO: Use GitHub Apps)
 - Webhooks set in both `client-repo` and `server-repo`, with *All events* going through.
 
 ## High level overview:
@@ -40,7 +40,7 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 
 ### Syncing server to client
 
-**Whenever there is a new commit on `master` branch on `server-repo**:
+**Whenever there is a new commit on `master` branch on `server-repo`**:
 
 - The application does a checkout of `master` on `client-repo` and **copies over** the `client` folder from `server-repo` to `client-repo`
 - The application commits the changes to `client-repo`, giving correct attribution.
