@@ -13,10 +13,25 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 - Once deemed **OK** to be merged, changes are brought into `server-repo`
 - Attribution is kept consistent in both repositories, as much as possible.
 
-## Requirements:
+## Usage:
 
+### Requirements
 - One github account (with `auth` token) to use as "actor" for all the synchronization. (TODO: Use GitHub Apps)
-- Webhooks set in both `client-repo` and `server-repo`, with *All events* going through.
+- A `client-repo`
+- A `server-repo`
+
+
+### Setup
+1. Configure the environment variables (as documented at the bottom of this README)
+2. Run `flow-bot` in a server somewhere, nothing down the address and the port
+3. On GitHub, go to `client-repo` > Settings > Webhooks and click on "Add webhook" 
+4. Enter the URL of your instance of `flow-bot` in "Paylod URL"
+5. Set `Content-type` to `application/json`
+6. Select "Send me **everything**"
+7. Ensure the "Active" checkbox is checked
+8. Click on "Add webhook"
+9. Repeat steps 3-8 for the `server-repo` 
+
 
 ## High level overview:
 
