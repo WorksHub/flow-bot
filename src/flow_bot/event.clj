@@ -46,19 +46,11 @@
 (defn client-prs []
   (pulls/pulls (env :client-org) (env :client-repo)))
 
-(defn original-pr-author-info [pr-id]
-  (let [commits (pulls/commits (env :server-org) (env :server-repo) pr-id {:auth (env :auth)})
+(defn pr-author [org repo pr-id]
+  (let [commits (pulls/commits org repo pr-id {:auth (env :auth)})
         commit (first commits)]
     {:name  (get-in commit [:commit :author :name])
      :email (get-in commit [:commit :author :email])}))
-
-(defn pr-author-info [pr]
-  (let [last-commit (git/commit (get-in pr [:head :repo :owner :login])
-                                (get-in pr [:head :repo :name])
-                                (get-in pr [:head :sha])
-                                {:auth (env :auth)})]
-    {:name  (get-in last-commit [:committer :name])
-     :email (get-in last-commit [:committer :email])}))
 ;;;
 
 (defn add-author! [sha author]
@@ -111,7 +103,7 @@
             branch (get-in pr [:head :ref])
             new-branch-name (str "client-" pr-id)
             new-pr-title (:title pr)
-            author (pr-author-info pr)
+            author (pr-author (env :client-org) (env :client-repo) pr-id)
             author-name (:name author)
             author-email (:email author)]
         (log/info (format "Syncing %s - branch %s - PR #%s - Author '%s' <%s> - Msg: %s" clone-url branch pr-id author-name author-email new-pr-title))
@@ -135,7 +127,7 @@
                merged?)
       (log/info "Server PR coming originally from Client Repo has been merged")
       (let [client-pr-id (str/replace pr-branch #"client-" "")
-            author (original-pr-author-info server-pr-id)
+            author (pr-author (env :server-org) (env :server-repo) server-pr-id)
             merge-commit-sha (get-in event [:pull_request :merge_commit_sha])
             _ (log/info (format "Saving commit %s to attribute to '%s' <%s>" merge-commit-sha (:name author) (:email author)))
             _ (add-author! merge-commit-sha author)
