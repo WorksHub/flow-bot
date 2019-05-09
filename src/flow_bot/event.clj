@@ -107,7 +107,7 @@
             author-name (:name author)
             author-email (:email author)]
         (log/info (format "Syncing %s - branch %s - PR #%s - Author '%s' <%s> - Msg: %s" clone-url branch pr-id author-name author-email new-pr-title))
-        (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s '%s'" clone-url branch pr-id author-name author-email new-pr-title)))
+        (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s '%s' %s %s %s" clone-url branch pr-id author-name author-email new-pr-title (env :server-repo) (env :client-repo) (env :client-folder))))
         (if (server-branch-exists? new-branch-name)
           (do
             (log/info "Branch successfully created, creating pull request!" new-branch-name new-pr-title)

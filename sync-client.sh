@@ -24,10 +24,12 @@ cd ../${CLIENT_REPO}
 git fetch
 git checkout master
 git reset --hard origin/master
-rm -rf ${CLIENT_FOLDER}
+
+# Removes everything in the top level except .git folder
+find . -mindepth 1 -maxdepth 1 | grep -v .git | xargs rm -rf
 
 # copies over the client folder from server to client
-cp -R ../${SERVER_REPO}/${CLIENT_FOLDER} .
+cp -R ../${SERVER_REPO}/${CLIENT_FOLDER}/* .
 git add --all
 
 # attribute the commit to the original author on the server repo

@@ -6,11 +6,6 @@ set -x
 set -e # Exit with nonzero when a command fails.
 set -u # Exit with nonzero when referencing an unbound variable
 
-SERVER_REPO="test-app"
-CLIENT_REPO="client-app"
-CLIENT_FOLDER="client"
-ORG="test-org-integration"
-
 NEW_REPO_URL=$1
 BRANCH=$2
 PULL=$3
@@ -18,7 +13,9 @@ NEW_REMOTE="remote-${PULL}"
 AUTHOR=$4
 AUTHOR_EMAIL=$5
 TITLE=$6
-
+SERVER_REPO=$7
+CLIENT_REPO=$8
+CLIENT_FOLDER=$9
 
 cd local-repos/${CLIENT_REPO}
 
@@ -36,11 +33,12 @@ git reset --hard origin/master
 # create a new branch with the id of the client PR
 git checkout -b client-${PULL}
 
-# delete the server version of the client folder
-rm -rf ${CLIENT_FOLDER}
+# delete the content of the server version of the client folder
+rm -rf ${CLIENT_FOLDER}/*
 
-# copy over the client version of the client folder
-cp -R ../${CLIENT_REPO}/${CLIENT_FOLDER} .
+# copy over the files from the client repo
+cp -R ../${CLIENT_REPO}/* ${CLIENT_FOLDER}/
+#rm -rf ${CLIENT_FOLDER}/.git
 
 # commit and keep the original author
 git add --all
