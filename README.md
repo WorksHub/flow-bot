@@ -66,14 +66,16 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 The program needs the following environment variables, supplied, for example, with a `.lein-env` file
 
 ```clojure
-{:server-org    "workshub"
- :server-repo   "test-app"
- :server-git    "XXX"
- :client-org    "test-org-integration"
- :client-repo   "client-app"
- :client-git    "XXX"
+{:server-org    "technomancy"
+ :server-repo   "leiningen"
+ :server-git    "https://USER:TOKEN@github.com/technomancy/leiningen.git"
+ :client-org    "WorksHub"
+ :client-repo   "client"
+ :client-git    "https://USER:TOKEN@github.com/WorksHub/client.git"
  :client-folder "client"
- :auth          "XXXX"
+ :auth          "TOKEN"
  :magic-string  "OK TO MERGE"
  :port          "3000"}
 ```
+
+Note that `:server-git` and `:client-git` environment variable contain the token from your chosen user in the repo URL.

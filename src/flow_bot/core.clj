@@ -27,7 +27,7 @@
   (POST "/" {:keys [headers body]}
     (let [event (assoc body :event-type (get headers "x-github-event"))
           repo-name (get-in event [:repository :name])]
-      (log/info "Received event from " repo-name ": " (:event-type event))
+      (log/info "Received event from" repo-name ":" (:event-type event))
       (log/debug event)
       (async/>!! event-queue event))
     (response/response "ok")))
