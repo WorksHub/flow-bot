@@ -25,8 +25,9 @@
 (defroutes handler
   (GET "/" _req (response/response "This service is API-only. Please refer to documentation"))
   (POST "/" {:keys [headers body]}
-    (let [event (assoc body :event-type (get headers "x-github-event"))]
-      (log/info "Received event: " (:event-type event))
+    (let [event (assoc body :event-type (get headers "x-github-event"))
+          repo-name (get-in event [:repository :name])]
+      (log/info "Received event from " repo-name ": " (:event-type event))
       (log/debug event)
       (async/>!! event-queue event))
     (response/response "ok")))
