@@ -121,10 +121,12 @@
   (let [pr-branch (get-in event [:pull_request :head :ref])
         server-pr-id (get-in event [:pull_request :number])
         closed? (= "closed" (:action event))
-        merged? (get-in event [:pull_request :merged])]
+        merged? (get-in event [:pull_request :merged])
+        client-pr? (re-find #"^client\-[0-9]+$" pr-branch)]
     (when (and (= (env :server-repo) (get-in event [:repository :name]))
                closed?
-               merged?)
+               merged?
+               client-pr?)
       (log/info "Server PR coming originally from Client Repo has been merged")
       (let [client-pr-id (str/replace pr-branch #"client-" "")
             author (pr-author (env :server-org) (env :server-repo) server-pr-id)
