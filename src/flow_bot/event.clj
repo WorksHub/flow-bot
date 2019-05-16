@@ -78,7 +78,7 @@
           author-name (or (:name original-author) (:name commit-author))
           author-email (or (:email original-author) (:email commit-author))
           message (get-in event [:head_commit :message])
-          sanitized-message (string/trim (string/replace message #"\(#\d+\)$" ""))]
+          sanitized-message (string/trim (string/replace message #"\(#\d+\)" ""))]
       (log/info (format "Merging commit '%s' <%s> from %s <%s>" sanitized-message head-commit-sha author-name author-email))
       (log/info (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s '%s' '%s' %s"
                                          (env :server-repo)
