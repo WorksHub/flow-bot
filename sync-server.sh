@@ -19,6 +19,9 @@ CLIENT_FOLDER=$9
 
 cd local-repos/${CLIENT_REPO}
 
+# clean up existing remotes
+git remote | grep -v origin | xargs -n 1 git remote rm
+
 # checkout locally the user branch of the client repo
 git remote add ${NEW_REMOTE} ${NEW_REPO_URL}
 git fetch ${NEW_REMOTE}
