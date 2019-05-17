@@ -63,6 +63,20 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 
 ## Running it locally
 
+### Prerequisites
+
+This program uses GNU version of `xargs`. If you are running under mac, make sure to run
+
+```shell
+brew install findutils
+```
+
+and follow the instructions on screen to add the installed binaries to your path.
+
+This is necessary because the version of xargs that comes shipped with MacOs does not support argument the `-r` used by the script
+
+### Environment variables for the bot
+
 The program needs the following environment variables, supplied, for example, with a `.lein-env` file
 
 ```clojure
