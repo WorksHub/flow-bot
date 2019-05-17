@@ -22,10 +22,18 @@ cd local-repos/${CLIENT_REPO}
 # clean up existing remotes
 git remote | grep -v origin | xargs -r -n 1 git remote rm
 
+# sync up local master branch
+git fetch
+git checkout master
+git reset --hard origin/master
+
 # checkout locally the user branch of the client repo
 git remote add ${NEW_REMOTE} ${NEW_REPO_URL}
 git fetch ${NEW_REMOTE}
 git checkout ${NEW_REMOTE}/${BRANCH}
+
+# merge master with the local branch
+git merge master
 
 # reset server repo to master
 cd ../${SERVER_REPO}
