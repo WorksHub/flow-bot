@@ -1,11 +1,11 @@
 (ns flow-bot.core
   (:require
     [clojure.core.async :as async]
-    [clojure.java.shell :as sh]
     [clojure.tools.logging :as log]
     [compojure.core :refer [defroutes GET PUT POST DELETE routes]]
     [environ.core :refer [env]]
     [flow-bot.event :as event]
+    [flow-bot.util :as util]
     [mount.core :as mount]
     [ring.adapter.jetty :as jetty]
     [ring.middleware.json :refer [wrap-json-body]]
@@ -39,12 +39,11 @@
   (-> (routes handler)
       (wrap-json-body {:keywords? true})))
 
-(defn init-repos! []
-  (log/info (sh/sh "sh" "-c" (format "./init-repos.sh %s %s %s %s" (env :server-repo) (env :server-git) (env :client-repo) (env :client-git)))))
+
 
 (mount/defstate repos
   :start (do (log/info "Initializing repos")
-             (init-repos!)))
+             (util/init-repos!)))
 
 (mount/defstate server
   :start (do (log/info "Starting server")

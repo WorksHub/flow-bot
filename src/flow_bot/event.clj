@@ -2,14 +2,14 @@
   (:require
     [clojure.java.shell :as sh]
     [clojure.string :as str]
-    [environ.core :refer [env]]
     [clojure.tools.logging :as log]
-    [tentacles.issues :as issues]
+    [environ.core :refer [env]]
+    [flow-bot.util :as util]
     [tentacles.data :as git]
+    [tentacles.issues :as issues]
     [tentacles.orgs :as orgs]
     [tentacles.pulls :as pulls]
-    [tentacles.repos :as repos]
-    [clojure.string :as string]))
+    [tentacles.repos :as repos]))
 
 (defonce app-state (atom {:authors {}}))
 
@@ -78,7 +78,7 @@
           author-name (or (:name original-author) (:name commit-author))
           author-email (or (:email original-author) (:email commit-author))
           message (get-in event [:head_commit :message])
-          sanitized-message (string/trim (string/replace message #"\(#\d+\)" ""))]
+          sanitized-message (str/trim (str/replace message #"\(#\d+\)" ""))]
       (log/info (format "Merging commit '%s' <%s> from %s <%s>" sanitized-message head-commit-sha author-name author-email))
       (log/info (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s '%s' '%s' %s"
                                          (env :server-repo)
@@ -116,7 +116,8 @@
               (if (= "open" (:state result))
                 (log/info "PR on server created succesfully")
                 (log/error "Error when creating server PR"))))
-          (log/error "ERROR WHEN SYNCING CLIENT TO SERVER"))))))
+          (do (log/error "ERROR WHEN SYNCING CLIENT TO SERVER")
+              (util/init-repos!)))))))
 
 (defmethod handle-event! "pull_request" [event]
   (let [pr-branch (get-in event [:pull_request :head :ref])
