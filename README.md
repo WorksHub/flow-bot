@@ -82,16 +82,12 @@ The program needs the following environment variables, supplied, for example, wi
 ```clojure
 {:server-org    "test-org-integration"
  :server-repo   "app"
- :server-git    "https://USER:TOKEN@github.com/test-org-integration/app.git"
  :client-org    "test-org-integration"
  :client-repo   "client"
- :client-git    "https://USER:TOKEN@github.com/test-org-integration/client.git"
  :client-folder "client"
- :auth          "TOKEN"
  :magic-string  "OK TO MERGE"
  :git-user      "GitUser"
  :git-email     "gitemail@example.com"
+ :git-token     "SUPERSECRETTOKEN"
  :port          "3000"}
 ```
-
-Note that `:server-git` and `:client-git` environment variable contain the token from your chosen user in the repo URL.

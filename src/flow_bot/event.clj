@@ -13,41 +13,44 @@
 
 (defonce app-state (atom {:authors {}}))
 
+(defn auth []
+  (str (env :git-user) ":" (env :git-token)))
+
 (defn create-server-pr [branch-name pr-title original-pr-id]
   (pulls/create-pull (env :server-org)
                      (env :server-repo)
                      pr-title
                      "master"
                      branch-name
-                     {:auth (env :auth)
+                     {:auth (auth)
                       :body (format "This is the code that appeared on %s/%s#%s"
                                     (env :client-org)
                                     (env :client-repo)
                                     original-pr-id)}))
 
 (defn client-pr [id]
-  (pulls/specific-pull (env :client-org) (env :client-repo) id {:auth (env :auth)}))
+  (pulls/specific-pull (env :client-org) (env :client-repo) id {:auth (auth)}))
 
 
 (defn close-client-pr [id]
-  (pulls/edit-pull (env :client-org) (env :client-repo) id {:auth  (env :auth)
+  (pulls/edit-pull (env :client-org) (env :client-repo) id {:auth  (auth)
                                                             :title "New title"
                                                             :body  "this should be closed"
                                                             :state "closed"}))
 
 (defn server-branch-exists? [branch-name]
-  (contains? (set (map :name (repos/branches (env :server-org) (env :server-repo) {:auth (env :auth)})))
+  (contains? (set (map :name (repos/branches (env :server-org) (env :server-repo) {:auth (auth)})))
              branch-name))
 
 (defn create-closing-comment [id]
-  (issues/create-comment (env :client-org) (env :client-repo) id "Thanks for contributing! This code has been merged upstream!" {:auth (env :auth)}))
+  (issues/create-comment (env :client-org) (env :client-repo) id "Thanks for contributing! This code has been merged upstream!" {:auth (auth)}))
 
 
 (defn client-prs []
   (pulls/pulls (env :client-org) (env :client-repo)))
 
 (defn pr-author [org repo pr-id]
-  (let [commits (pulls/commits org repo pr-id {:auth (env :auth)})
+  (let [commits (pulls/commits org repo pr-id {:auth (auth)})
         commit (first commits)]
     {:name  (get-in commit [:commit :author :name])
      :email (get-in commit [:commit :author :email])}))
@@ -92,7 +95,7 @@
   (let [pr-id (get-in event [:issue :number])
         user (get-in event [:comment :user :login])
         org (get-in event [:organization :login])
-        owner? (orgs/member? org user {:auth (env :auth)})]
+        owner? (orgs/member? org user {:auth (auth)})]
     (when (and (= (env :client-repo) (get-in event [:repository :name]))
                owner?
                (get-in event [:comment :body])
@@ -100,7 +103,7 @@
       (log/info "Detected a PR comment saying it's okay to merge PR: " pr-id)
       (let [pr (client-pr pr-id)
             clone-url (get-in pr [:head :repo :clone_url])
-            clone-url-with-auth (str/replace clone-url "https://github.com/" (str "https://" (env :auth) "@github.com/"))
+            clone-url-with-auth (str/replace clone-url "https://github.com/" (str "https://" (auth) "@github.com/"))
             branch (get-in pr [:head :ref])
             new-branch-name (str "client-" pr-id)
             new-pr-title (:title pr)

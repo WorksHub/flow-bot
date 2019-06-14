@@ -33,7 +33,17 @@
     (response/response "ok")))
 
 (defn print-env []
-  (log/info "Environment:" (select-keys env [:server-org :server-repo :server-git :client-org :client-repo :client-git :client-folder :auth :magic-string])))
+  (log/info "Environment:"
+            (select-keys env [:server-org
+                              :server-repo
+                              :client-org
+                              :client-repo
+                              :client-folder
+                              :magic-string
+                              :git-user
+                              :git-email
+                              :git-token
+                              :port])))
 
 (def app
   (-> (routes handler)
