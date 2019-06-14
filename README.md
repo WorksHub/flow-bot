@@ -80,15 +80,17 @@ This is necessary because the version of xargs that comes shipped with MacOs doe
 The program needs the following environment variables, supplied, for example, with a `.lein-env` file
 
 ```clojure
-{:server-org    "technomancy"
- :server-repo   "leiningen"
- :server-git    "https://USER:TOKEN@github.com/technomancy/leiningen.git"
- :client-org    "WorksHub"
+{:server-org    "test-org-integration"
+ :server-repo   "app"
+ :server-git    "https://USER:TOKEN@github.com/test-org-integration/app.git"
+ :client-org    "test-org-integration"
  :client-repo   "client"
- :client-git    "https://USER:TOKEN@github.com/WorksHub/client.git"
+ :client-git    "https://USER:TOKEN@github.com/test-org-integration/client.git"
  :client-folder "client"
  :auth          "TOKEN"
  :magic-string  "OK TO MERGE"
+ :git-user      "GitUser"
+ :git-email     "gitemail@example.com"
  :port          "3000"}
 ```
 

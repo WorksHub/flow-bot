@@ -11,6 +11,8 @@ SERVER_REPO=$1
 SERVER_GIT=$2
 CLIENT_REPO=$3
 CLIENT_GIT=$4
+GIT_USER=$5
+GIT_EMAIL=$6
 
 mkdir -p local-repos
 
@@ -22,12 +24,12 @@ git clone ${CLIENT_GIT}
 
 cd ${SERVER_REPO}
 
-git config user.name "WorksHubCodi"
-git config user.email "davide+kodi@functionalworks.com"
+git config user.name ${GIT_USER}
+git config user.email ${GIT_EMAIL}
 
 cd ../${CLIENT_REPO}
 
-git config user.name "WorksHubCodi"
-git config user.email "davide+kodi@functionalworks.com"
+git config user.name ${GIT_USER}
+git config user.email ${GIT_EMAIL}
 
 cd ../..
