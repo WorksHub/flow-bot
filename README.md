@@ -65,15 +65,15 @@ This application enables a _sync-based workflow_ for open-sourcing only one part
 
 ### Prerequisites
 
-This program uses GNU version of `xargs`. If you are running under mac, make sure to run
+This program uses GNU version of `xargs`. If you want to hack on flow-bot are running under macOS, make sure to execute
 
 ```shell
 brew install findutils
 ```
 
-and follow the instructions on screen to add the installed binaries to your path.
+and follow the instructions on screen to add the GNU versions of those programs on your machine.
 
-This is necessary because the version of xargs that comes shipped with MacOs does not support argument the `-r` used by the script
+This is necessary because the version of xargs that comes shipped with macOS does not support the `-r` argument used by the script
 
 ### Environment variables for the bot
 
