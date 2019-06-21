@@ -1,4 +1,4 @@
-(defproject flow-bot "0.1.0-SNAPSHOT"
+(defproject flow-bot "1.0.0-SNAPSHOT"
   :profiles {:uberjar {:main         flow_bot.core
                        :omit-source  true
                        :aot          :all
