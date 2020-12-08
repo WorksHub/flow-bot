@@ -39,7 +39,7 @@
                                                             :state "closed"}))
 
 (defn server-branch-exists? [branch-name]
-  (contains? (set (map :name (repos/branches (env :server-org) (env :server-repo) {:auth (auth)})))
+  (contains? (set (map :name (repos/branches (env :server-org) (env :server-repo) {:auth (auth) :per-page 100})))
              branch-name))
 
 (defn create-closing-comment [id]
@@ -92,24 +92,24 @@
                                          author-email))))))
 
 (defmethod handle-event! "issue_comment" [event]
-  (let [pr-id (get-in event [:issue :number])
-        user (get-in event [:comment :user :login])
-        org (get-in event [:organization :login])
+  (let [pr-id  (get-in event [:issue :number])
+        user   (get-in event [:comment :user :login])
+        org    (get-in event [:organization :login])
         owner? (orgs/member? org user {:auth (auth)})]
     (when (and (= (env :client-repo) (get-in event [:repository :name]))
                owner?
                (get-in event [:comment :body])
                (str/includes? (get-in event [:comment :body]) (env :magic-string)))
       (log/info "Detected a PR comment saying it's okay to merge PR: " pr-id)
-      (let [pr (client-pr pr-id)
-            clone-url (get-in pr [:head :repo :clone_url])
+      (let [pr                  (client-pr pr-id)
+            clone-url           (get-in pr [:head :repo :clone_url])
             clone-url-with-auth (str/replace clone-url "https://github.com/" (str "https://" (auth) "@github.com/"))
-            branch (get-in pr [:head :ref])
-            new-branch-name (str "client-" pr-id)
-            new-pr-title (:title pr)
-            author (pr-author (env :client-org) (env :client-repo) pr-id)
-            author-name (:name author)
-            author-email (:email author)]
+            branch              (get-in pr [:head :ref])
+            new-branch-name     (str "client-" pr-id)
+            new-pr-title        (:title pr)
+            author              (pr-author (env :client-org) (env :client-repo) pr-id)
+            author-name         (:name author)
+            author-email        (:email author)]
         (log/info (format "Syncing %s - branch %s - PR #%s - Author '%s' <%s> - Msg: %s" clone-url-with-auth branch pr-id author-name author-email new-pr-title))
         (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s '%s' %s %s %s" clone-url-with-auth branch pr-id author-name author-email new-pr-title (env :server-repo) (env :client-repo) (env :client-folder))))
         (if (server-branch-exists? new-branch-name)
@@ -119,27 +119,27 @@
               (if (= "open" (:state result))
                 (log/info "PR on server created succesfully")
                 (log/error "Error when creating server PR"))))
-          (do (log/error "ERROR WHEN SYNCING CLIENT TO SERVER")
+          (do (log/errorf "ERROR WHEN SYNCING CLIENT TO SERVER - BRANCH %s NOT FOUND")
               (util/init-repos!)))))))
 
 (defmethod handle-event! "pull_request" [event]
-  (let [pr-branch (get-in event [:pull_request :head :ref])
+  (let [pr-branch    (get-in event [:pull_request :head :ref])
         server-pr-id (get-in event [:pull_request :number])
-        closed? (= "closed" (:action event))
-        merged? (get-in event [:pull_request :merged])
-        client-pr? (re-find #"^client\-[0-9]+$" pr-branch)]
+        closed?      (= "closed" (:action event))
+        merged?      (get-in event [:pull_request :merged])
+        client-pr?   (re-find #"^client\-[0-9]+$" pr-branch)]
     (when (and (= (env :server-repo) (get-in event [:repository :name]))
                closed?
                merged?
                client-pr?)
       (log/info "Server PR coming originally from Client Repo has been merged")
-      (let [client-pr-id (str/replace pr-branch #"client-" "")
-            author (pr-author (env :server-org) (env :server-repo) server-pr-id)
+      (let [client-pr-id     (str/replace pr-branch #"client-" "")
+            author           (pr-author (env :server-org) (env :server-repo) server-pr-id)
             merge-commit-sha (get-in event [:pull_request :merge_commit_sha])
-            _ (log/info (format "Saving commit %s to attribute to '%s' <%s>" merge-commit-sha (:name author) (:email author)))
-            _ (add-author! merge-commit-sha author)
-            _ (log/info (format "Retrieving info about Client PR #%s" client-pr-id))
-            pr (client-pr client-pr-id)]
+            _                (log/info (format "Saving commit %s to attribute to '%s' <%s>" merge-commit-sha (:name author) (:email author)))
+            _                (add-author! merge-commit-sha author)
+            _                (log/info (format "Retrieving info about Client PR #%s" client-pr-id))
+            pr               (client-pr client-pr-id)]
         (when (= "open" (:state pr))
           (log/info "Notifying user that their PR was merged upstream")
           (create-closing-comment client-pr-id)
