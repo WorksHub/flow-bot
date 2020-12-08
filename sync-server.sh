@@ -54,7 +54,6 @@ cp -R ../${CLIENT_REPO}/* ${CLIENT_FOLDER}/
 # commit and keep the original author
 git add --all
 git commit -m "${TITLE}" --author "${AUTHOR} <${AUTHOR_EMAIL}>"
-git pull origin client-${PULL} --no-edit
 git push origin client-${PULL}
 
 # cleanup the new branch from the local copy of server repo
