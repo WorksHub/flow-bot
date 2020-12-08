@@ -55,12 +55,12 @@ cp -R ../${CLIENT_REPO}/* ${CLIENT_FOLDER}/
 # commit and keep the original author
 git add --all
 git commit -m "${TITLE}" --author "${AUTHOR} <${AUTHOR_EMAIL}>"
-if git ls-remote --heads origin | grep ${NEW_CLIENT}; then
-    echo "Found existing branch so pulling..."
-    git pull origin client-${PULL} --no-edit
-else
-    echo "No existing branch so continuing..."
-fi
+# if git ls-remote --heads origin | grep ${NEW_CLIENT}; then
+#     echo "Found existing branch so pulling..."
+#     git pull origin client-${PULL} --no-edit
+# else
+#     echo "No existing branch so continuing..."
+# fi
 
 git push origin ${NEW_CLIENT}
 
