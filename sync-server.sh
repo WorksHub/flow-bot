@@ -10,6 +10,7 @@ NEW_REPO_URL=$1
 BRANCH=$2
 PULL=$3
 NEW_REMOTE="remote-${PULL}"
+NEW_CLIENT="client-${PULL}"
 AUTHOR=$4
 AUTHOR_EMAIL=$5
 TITLE=$6
@@ -42,7 +43,7 @@ git checkout master
 git reset --hard origin/master
 
 # create a new branch with the id of the client PR
-git checkout -b client-${PULL}
+git checkout -b ${NEW_CLIENT}
 
 # delete the content of the server version of the client folder
 rm -rf ${CLIENT_FOLDER}/*
@@ -54,7 +55,14 @@ cp -R ../${CLIENT_REPO}/* ${CLIENT_FOLDER}/
 # commit and keep the original author
 git add --all
 git commit -m "${TITLE}" --author "${AUTHOR} <${AUTHOR_EMAIL}>"
-git push origin client-${PULL}
+if git ls-remote --heads origin | grep ${NEW_CLIENT}; then
+    echo "Found existing branch so pulling..."
+    git pull origin client-${PULL} --no-edit
+else
+    echo "No existing branch so continuing..."
+fi
+
+git push origin ${NEW_CLIENT}
 
 # cleanup the new branch from the local copy of server repo
 git checkout master
