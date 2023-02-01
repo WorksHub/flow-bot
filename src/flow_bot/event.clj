@@ -83,13 +83,13 @@
           message (get-in event [:head_commit :message])
           sanitized-message (str/trim (str/replace message #"\(#\d+\)" ""))]
       (log/info (format "Merging commit '%s' <%s> from %s <%s>" sanitized-message head-commit-sha author-name author-email))
-      (log/info (sh/sh "sh" "-c" (format "./sync-client.sh %s %s %s '%s' '%s' %s"
-                                         (env :server-repo)
-                                         (env :client-repo)
-                                         (env :client-folder)
-                                         sanitized-message
-                                         author-name
-                                         author-email))))))
+      (log/info (sh/sh "./sync-client.sh"
+                       (env :server-repo)
+                       (env :client-repo)
+                       (env :client-folder)
+                       sanitized-message
+                       author-name
+                       author-email)))))
 
 (defmethod handle-event! "issue_comment" [event]
   (let [pr-id  (get-in event [:issue :number])
@@ -111,7 +111,17 @@
             author-name         (:name author)
             author-email        (:email author)]
         (log/info (format "Syncing %s - branch %s - PR #%s - Author '%s' <%s> - Msg: %s" clone-url-with-auth branch pr-id author-name author-email new-pr-title))
-        (log/info (sh/sh "sh" "-c" (format "./sync-server.sh %s %s %s '%s' %s '%s' %s %s %s" clone-url-with-auth branch pr-id author-name author-email new-pr-title (env :server-repo) (env :client-repo) (env :client-folder))))
+        (log/info (sh/sh
+                   "./sync-server.sh"
+                   clone-url-with-auth
+                   branch
+                   pr-id
+                   author-name
+                   author-email
+                   new-pr-title
+                   (env :server-repo)
+                   (env :client-repo)
+                   (env :client-folder)))
         (if (server-branch-exists? new-branch-name)
           (do
             (log/info "Branch successfully created, creating pull request!" new-branch-name new-pr-title)
